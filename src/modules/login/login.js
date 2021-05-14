@@ -4,6 +4,7 @@ import firebase from 'firebase'
 import Swal from "sweetalert2"
 
 export default function Login() {
+    document.title = "Login - GoMbl Jobs";
     const auth = firebase.auth();
     const emailRef = useRef();
     const passwordRef = useRef();
