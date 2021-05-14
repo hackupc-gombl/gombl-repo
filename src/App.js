@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Login from "./modules/login/login";
 import Offers from "./modules/offers/offers";
+import Offer from "./modules/offers/offer/offer"
 import firebase from "firebase";
 
 const firebaseConfig = {
@@ -15,11 +16,14 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 export default function App() {
+  
+
   return (
     <Router>
         <Switch>
-        <Route path="/offers"> <Offers/> </Route>
-          <Route path="/"> <Login/> </Route>
+          <Route exact path="/"> <Login/> </Route>
+          <Route exact path="/offers"> <Offers/> </Route>
+          <Route path="/offers/:id"> <Offer/> </Route>
         </Switch>
     </Router>
   );
