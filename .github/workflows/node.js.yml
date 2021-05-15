@@ -26,5 +26,5 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: yarn
-    - run: yarn build CI=false
+    - run: CI=yarn build
     - run: firebase deploy
