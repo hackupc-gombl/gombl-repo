@@ -1,0 +1,14 @@
+.button {
+    background-color: #09BC8A;
+    padding: 10px 50px 10px 50px;
+    border-radius: 10px;
+    margin: 30px 30px 10px 30px;
+    font-family: "Inter";
+    cursor: pointer;
+    color: white;
+    border: 0
+}
+
+.white {
+    color: white
+}

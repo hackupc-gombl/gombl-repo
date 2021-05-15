@@ -4,6 +4,8 @@ import { useHistory } from "react-router-dom";
 import firebase from 'firebase'
 import Swal from "sweetalert2"
 import OffersItem from "./offersItem"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSignOutAlt, faPlus, faBuilding } from '@fortawesome/free-solid-svg-icons'
 
 export default function Offers() {
     const [offers,setOffers] = useState([]);
@@ -40,6 +42,13 @@ export default function Offers() {
     const onClick = () =>{
         //window.location.href = "/offers"
     }
+    const companyDetails = () =>{
+        history.push("/companyDetails");
+    }
+
+    function createOffer() {
+        history.push("/createOffer");
+    }
 
     const getOffers = () => { 
         return(offers.map(value => 
@@ -54,15 +63,18 @@ export default function Offers() {
             setUser(user);
         }
         else {
-            window.location.href = "/"
+            history.push( "/");
         }
       });
     
 
     return <div style={constants.STYLES.body}>
-        <div onClick={signOut} style={STYLES.signOut}>Sign Out</div>
+        <div style={STYLES.topRightButtons}>
+            <div onClick={companyDetails}><FontAwesomeIcon icon={faBuilding} style={STYLES.settings} /></div>
+            <div onClick={signOut}><FontAwesomeIcon icon={faSignOutAlt} style={STYLES.settings} /></div>
+        </div>
         <p style={STYLES.offersTitle}>Offers</p>
-        <p style={STYLES.createOffer}>Create offer</p>
+        <p style={STYLES.createOffer} onClick={createOffer}><FontAwesomeIcon  icon={faPlus}/> Create offer</p>
         <div style = {STYLES.offersBox}>
             {getOffers()}
         </div>
@@ -70,23 +82,33 @@ export default function Offers() {
 }
 
 const STYLES = {
-    signOut: {
+    topRightButtons: {
+        textDecorationLine: "underline",
         position: "absolute",
-        top: "5px",
-        right: "5px",
-        cursor: "pointer"
+        top: "25px",
+        right: "6vw",
+        marginTop:"10px",
+        cursor: "pointer",
+        display: "flex",
+        flexDirection: "row"
     },
     offersTitle: {
-        fontSize:"35px",
+        fontSize:"4em",
         fontWeight: "bold",
         textAlign: "center"
     },
+    settings: {
+        fontSize:"2em",
+        marginLeft: "20px"
+    },
     createOffer: {
+        marginTop: "5vh",
         textAlign: "right",
-        marginRight: "20vw",
+        marginRight: "6vw",
         cursor: "pointer"
     },
     offersBox:{
-        padding: "50px 5vw",
+        paddingLeft: "5vw",
+        paddingRight: "5vw"
     }
 }

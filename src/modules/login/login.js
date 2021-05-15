@@ -2,13 +2,15 @@ import constants from "../../strings/constants"
 import { useRef } from "react"
 import firebase from 'firebase'
 import Swal from "sweetalert2"
+import { useHistory } from "react-router-dom";
 
 export default function Login() {
     document.title = "Login - GoMbl Jobs";
     const auth = firebase.auth();
     const emailRef = useRef();
     const passwordRef = useRef();
-
+    const history = useHistory();
+    
     function handleKeypress (e) {
         if (e.key === "Enter") {
             signIn();
@@ -17,7 +19,7 @@ export default function Login() {
 
     firebase.auth().onAuthStateChanged(function(user) {
         if (user) 
-            window.location.href = "/offers"
+            history.push("/offers");
     });
 
     function signUp() {
@@ -27,7 +29,14 @@ export default function Login() {
                 title: 'Error!',
                 text: err.message,
                 icon: 'error',
-                confirmButtonText: 'Ok'
+                confirmButtonText: 'Ok',
+                background: constants.COLORS.BACKGROUNDITEM,
+                customClass: {
+                    confirmButton: 'button',
+                    title: 'white',
+                    htmlContainer: "white"
+                },
+                buttonsStyling: false,
               })
         });        
     }
@@ -38,7 +47,14 @@ export default function Login() {
                 title: 'Error!',
                 text: err.message,
                 icon: 'error',
-                confirmButtonText: 'Ok'
+                confirmButtonText: 'Ok',
+                background: constants.COLORS.BACKGROUNDITEM,
+                customClass: {
+                    confirmButton: 'button',
+                    title: 'white',
+                    htmlContainer: "white"
+                },
+                buttonsStyling: false,
               })
         })
     }
@@ -59,7 +75,7 @@ export default function Login() {
 }
 
 const STYLES = {
-    title: {
+  title: {
     fontSize:'50px',
     fontWeight: "bolder",
     marginBottom: "50px"
@@ -88,7 +104,8 @@ const STYLES = {
     width: "40vw",
     height: "20px",
     borderRadius: "10px",
-    padding: "10px"
+    padding: "10px",
+    boxSizing: "unset"
   },
   signUp: {
     cursor: "pointer"

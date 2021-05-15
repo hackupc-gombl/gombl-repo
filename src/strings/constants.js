@@ -1,10 +1,10 @@
 import "../fonts/inter.css"
 
-const QUESTION_TYPES = {
-  OPEN_ANSWER: "1",
-  TEST_UNIQUE_ANSWER: "2",
-  TEST_MULTIPLE_ANSWER: "3"
-};
+const QUESTION_TYPES = [
+  { value: 1, label: 'Multiple Choice' },
+  { value: 3, label: 'Open Answer' },
+];
+
 
 const TYPE_QUESTION_ANSWERS = {
   INCORRECT: false,
@@ -26,7 +26,7 @@ const STYLES = {
   bodyCenter: {
     backgroundColor: COLORS.BACKGROUND,
     width: "100vw",
-    height: "100vh",
+    minHeight: "100vh",
     color: COLORS.FONT,
     fontFamily: 'Inter',
     display: "flex",
@@ -36,7 +36,7 @@ const STYLES = {
   body: {
     backgroundColor: COLORS.BACKGROUND,
     width: "100vw",
-    height: "100vh",
+    minHeight: "100vh",
     color: COLORS.FONT,
     fontFamily: 'Inter',
     display: "flex",

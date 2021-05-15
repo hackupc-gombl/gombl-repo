@@ -1,8 +1,11 @@
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Login from "./modules/login/login";
 import Offers from "./modules/offers/offers";
+import CompanyDetails from "./modules/companyDetails/companyDetails";
 import Offer from "./modules/offers/offer/offer"
+import CreateTypeForm from "./modules/createTypeForm/createTypeForm"
 import firebase from "firebase";
+import "./swal.css"
 
 const firebaseConfig = {
   apiKey: "AIzaSyA8uN9OT4DLMtm3FGudAoGo5KmCwgDH5XQ",
@@ -23,7 +26,9 @@ export default function App() {
         <Switch>
           <Route exact path="/"> <Login/> </Route>
           <Route exact path="/offers"> <Offers/> </Route>
+          <Route exact path="/companyDetails"> <CompanyDetails/> </Route>
           <Route path="/offers/:id"> <Offer/> </Route>
+          <Route exact path="/createOffer"> <CreateTypeForm/>  </Route>
         </Switch>
     </Router>
   );
