@@ -63,8 +63,7 @@ const OffersItem = ({offer}) => {
                 }).catch((error) => {
                     console.error("Error removing document: ", error);
                 });
-                
-
+                window.location.reload()
             }
           })
     }
@@ -88,9 +87,6 @@ const OffersItem = ({offer}) => {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item href="#/action-1">Edit Offer</Dropdown.Item>
-                            <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-                            <Dropdown.Divider />
                             <Dropdown.Item onClick={(e) => { deleteOffer()}}>&times; Delete Offer</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>

@@ -5,35 +5,73 @@ import { EditText } from 'react-edit-text';
 
 function MultipleChoice({form, index}) {
     form.fields[index].type = "multiple_choice";
+    form.fields[index].properties.allow_multiple_selection = true;
     const [choices, setChoices] = useState([
         {
-            ref: "option-0",
+            ref: "option-" + index + "-0",
             label: "Option 1"
         },
         {
-            ref: "option-1",
+            ref: "option-" + index + "-1",
             label: "Option 2"
         },
     ]);
 
     const [checkers, setCheckers] = useState([false, false]);
+
     form.fields[index].properties.choices = choices;
-    form.logic[index].actions[0].condition.vars = [
-        { 
-            type: "field",
-            value: "ref-" + index
+
+    useEffect(function() {
+        let refs = [];
+        for(let choice of choices) {
+            refs.push(choice.ref);
         }
-    ];
-    for(let checker in checkers){
-        if(checkers[checker]) {
-            form.logic[index].actions[0].condition.vars.push({
-                type: "choice",
-                value: "option-" + checker
-            });
+
+        let logicCopy = []
+        for(let logic in form.logic){
+            if(!refs.includes(form.logic[logic].actions[0].condition.vars[1].value))
+                logicCopy.push(form.logic[logic]);
         }
-    }
-    console.log(checkers);
-    console.log(form);
+        form.logic = logicCopy;
+        
+        for(let choice in choices) {
+            if(checkers[choice] === true) { 
+                form.logic.push({
+                    type: "field",
+                    ref: "ref-" + index,
+                    actions: [
+                        { 
+                            action: "add",
+                            details: {
+                                target: {
+                                    type: "variable",
+                                    value: "score"
+                                },
+                                value: {
+                                    type: "constant",
+                                    value: 1
+                                }
+                            },
+                            condition: {
+                                op: "is",
+                                vars: [
+                                {
+                                    type: "field",
+                                    value: "ref-" + index
+                                },
+                                {
+                                    type: "choice",
+                                    value: choices[choice].ref
+                                }]
+                            }
+                        }
+                    ]
+                });
+            }
+        }
+        console.log(form.logic);
+    }, [checkers]);
+
 
     function getOptions() {
         let elements = [];
@@ -64,7 +102,6 @@ function MultipleChoice({form, index}) {
                             console.log(currentChoice);
                             let array = [...choices];
                             array.splice(currentChoice, 1);
-                            console.log(array);
                             setChoices(array);
                         }} style={STYLES.removeOption}/>
                     : null}
@@ -77,8 +114,8 @@ function MultipleChoice({form, index}) {
     }
 
     function addOption() {
-        let num = choices.length + 1;
-        setChoices((prev) => [...prev, {ref: "option-" + num, label: "Option " + num}]);
+        let num = choices.length;
+        setChoices((prev) => [...prev, {ref: "option-" + index + "-" + num, label: "Option " + num}]);
     }
 
     return (

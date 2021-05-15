@@ -3,17 +3,20 @@ import { useEffect, useRef, useState } from "react";
 import { EditText } from "react-edit-text";
 import "react-edit-text/dist/index.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 import Question from "./question";
 import Swal from "sweetalert2";
-import firebase from 'firebase';
+import firebase from "firebase";
 import { useHistory } from "react-router";
-
 //perdoname dios por hacer esto
 function CreateTypeForm() {
-    const history = useHistory();
+  const history = useHistory();
   let [form, setForm] = useState({
     title: "My Offer",
+    theme: {
+      href: "https://api.typeform.com/themes/ZFDEUn"
+    },
     variables: {
       score: 0
     },
@@ -31,14 +34,14 @@ function CreateTypeForm() {
         title: "My Offer",
         properties: {
           show_button: true,
-          description: "descripcion",
+          description: "",
           button_text: "Start"
         }
       }
     ],
     thankyou_screens: [
       {
-        ref: "incorrect",
+        ref: "correct",
         title: "Congratulations, you are elegible for the job offer!",
         properties: {
           show_button: true,
@@ -49,7 +52,7 @@ function CreateTypeForm() {
         }
       },
       {
-        ref: "correct",
+        ref: "incorrect",
         title: "Sorry",
         properties: {
           show_button: true,
@@ -66,30 +69,35 @@ function CreateTypeForm() {
 
   const [user, setUser] = useState({});
 
-  firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-            setUser(user);
-        }
-        else {
-            history.push("/");
-        }
-    });
+  firebase.auth().onAuthStateChanged(function (user) {
+    if (user) {
+      setUser(user);
+    } else {
+      history.push("/");
+    }
+  });
 
   useEffect(function () {
     addQuestion();
   }, []);
 
-  useEffect(function() {
-    if(!user.uid)
-        return
-    let companiesRef = firebase.firestore().collection("empresas").doc(user.uid);
-    companiesRef.get(user.uid).then(function(data) {
-        if(data.exists) {
-            for(let index in form.thankyou_screens)
-                form.thankyou_screens[index].properties.redirect_url = data.data().Website;
+  useEffect(
+    function () {
+      if (!user.uid) return;
+      let companiesRef = firebase
+        .firestore()
+        .collection("empresas")
+        .doc(user.uid);
+      companiesRef.get(user.uid).then(function (data) {
+        if (data.exists) {
+          for (let index in form.thankyou_screens)
+            form.thankyou_screens[index].properties.redirect_url =
+              data.data().Website;
         }
-    });
-  }, [user])
+      });
+    },
+    [user]
+  );
 
   function changeTitle(text) {
     form.title = text.value;
@@ -97,21 +105,68 @@ function CreateTypeForm() {
   }
 
   function createOffer() {
-    let logic = form.logic.filter(function (value) {
-      return value != null;
+    /*for(let index = 0; index<form.logic.length; index++){
+          if(form.logic[index] != null && form.logic[index].actions[0].condition.vars.length < 2 && form.fields[index].type == "multiple_choice")
+            console.log(form.logic[index].actions[0].condition.vars.length)
+            console.log(form.fields[index].type)
+            return (
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'You must select the correct answer for all questions'
+                  })
+            );
+    }*/
+
+    form.fields.push({
+      ref: "email",
+      title: "Your contact email",
+      type: "email"
     });
-    form.logic = logic;
+
+    form.logic.push({
+      type: "field",
+      ref: "email",
+      actions: [{
+          action: "jump",
+          details: {
+              to: {
+                type: "thankyou",
+                value: "incorrect"
+              }
+          }, condition: {
+            op: "lower_than",
+            vars:[
+              {
+                type: "variable",
+                value: "score"
+              },
+              {
+                type: "constant",
+                value: form.logic.length - 1
+              }
+            ]
+          }
+        }
+      ]
+    });
+
     let data = JSON.stringify(form);
-    fetch( "https://api.typeform.com/forms",{
-        method: "POST",
-        headers: {
-            Authorization: "Bearer 8YHjqMLzHzp1kPBYpMLuDP4fssDQqMKzbGa5V5vYojSL",
-        },
-        body: data
-    }).then(response =>{
-        return response.json();}
-      )
-      .then(json => {
+    fetch("https://api.typeform.com/forms", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer 8YHjqMLzHzp1kPBYpMLuDP4fssDQqMKzbGa5V5vYojSL"
+      },
+      body: data
+    }).then(response => response.json())
+    .then( json => {
+        let url = json._links.display;
+        firebase.firestore().collection("offers").add({
+            company: user.uid,
+            title: form.title,
+            url: url
+        });
+
         Swal.fire({
           title: "Ok!",
           text: "Your offer was created successfully!",
@@ -124,8 +179,12 @@ function CreateTypeForm() {
             htmlContainer: "white"
           },
           buttonsStyling: false
-        })
-    });
+        }).then((result) => {
+          if (result.isConfirmed) {
+            history.push("/offers/")
+          } 
+        });
+      });
   }
 
   function getQuestions() {
@@ -144,34 +203,13 @@ function CreateTypeForm() {
       title: "Question " + index,
       properties: {}
     });
-    copy.logic.push({
-      type: "field",
-      ref: "ref-" + index,
-      actions: [
-        {
-          action: "add",
-          details: {
-            target: {
-              type: "variable",
-              value: "score"
-            },
-            value: {
-              type: "constant",
-              value: 1
-            }
-          },
-          condition: {
-            op: "is",
-            vars: []
-          }
-        }
-      ]
-    });
+    
     setForm(copy);
   }
 
   return (
     <div style={constants.STYLES.body}>
+      <FontAwesomeIcon icon={faArrowLeft} style={STYLES.backArrow} onClick={() => history.push("/offers")}/>
       <div style={STYLES.title}>
         <EditText
           name="title"
@@ -228,6 +266,16 @@ const STYLES = {
   buttonsContainer: {
     display: "flex",
     flexDirection: "row"
+  },
+  backArrow: {
+    position: "absolute",
+    top: "30px",
+    left: "30px",
+    cursor: "pointer",
+    color: "white",
+    transition:'0.5s',
+    width:'50px',
+    height:'50px'
   }
 };
 

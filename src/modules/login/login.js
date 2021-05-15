@@ -10,7 +10,7 @@ export default function Login() {
     const emailRef = useRef();
     const passwordRef = useRef();
     const history = useHistory();
-    
+
     function handleKeypress (e) {
         if (e.key === "Enter") {
             signIn();

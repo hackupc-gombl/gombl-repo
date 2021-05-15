@@ -43,7 +43,7 @@ export default function CompanyDetails() {
   const WebsiteRef = useRef();
   const PhoneNumberRef = useRef();
   function saveData() {
-    empreref.doc(user.uid).update({Name:NameRef.current.value, Address:AddressRef.current.value, Website:WebsiteRef.current.value, Phonenumber:PhoneNumberRef.current.value})
+    empreref.doc(user.uid).set({Name:NameRef.current.value, Address:AddressRef.current.value, Website:WebsiteRef.current.value, Phonenumber:PhoneNumberRef.current.value})
     .then((result) =>{
       Swal.fire(
         'Saved!',
@@ -87,7 +87,7 @@ export default function CompanyDetails() {
             style={STYLES.inputTextPhoneNumber}
             ref={PhoneNumberRef}
           ></input>
-          <div style={{display:'inline'}}>
+          <div style={{display:'flex',flexDirection:'row-reverse', }}>
             <div style={STYLES.saveButton} onClick={saveData}>
               Save
             </div>
